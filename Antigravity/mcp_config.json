@@ -1,13 +1,18 @@
 {
-    "mcpServers": {
-        "nixos": {
-            "command": "mcp-nixos"
-        },
-        "context7": {
-            "serverUrl": "https://mcp.context7.com/mcp",
-            "headers": {
-                "CONTEXT7_API_KEY": "YOUR_CONTEXT7_API_KEY"
-            }
-        }
+  "mcpServers": {
+    "nixos": {
+      "command": "mcp-nixos"
+    },
+    "context7": {
+      "serverUrl": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "YOUR_CONTEXT7_API_KEY"
+      },
+      "disabled": false
+    },
+    "microsoft-learn": {
+      "serverUrl": "https://learn.microsoft.com/api/mcp",
+      "disabled": false
     }
+  }
 }
