@@ -269,8 +269,10 @@ fn documented_host_quirks_survive() {
 
     let copilot = text("GitHubCopilotCLI/mcp-config.json");
     assert!(
-        !copilot.contains("\"mcpServers\""),
-        "Copilot CLI keys servers at the top level, with no wrapper"
+        copilot.contains("\"mcpServers\""),
+        "Copilot CLI requires the `mcpServers` wrapper; a bare top-level server map \
+         was accepted before CLI 1.0.80 and is now rejected outright, taking every \
+         server with it"
     );
 
     let opencode = text("OpenCode/opencode.jsonc");

@@ -10,8 +10,7 @@
 //!
 //! The traps documented in `CLAUDE.md` each reduce to a single field here: Qwen's
 //! `httpUrl` (rather than `url`), Codex's `http_headers` (rather than `headers`),
-//! Copilot CLI's missing `mcpServers` wrapper, opencode's `environment` (rather than
-//! `env`), and goose's `cmd`/`envs`/`uri`.
+//! opencode's `environment` (rather than `env`), and goose's `cmd`/`envs`/`uri`.
 //!
 //! This table describes *mechanics*. What is declared, and where each host's live
 //! config lives, is content and belongs in `mcp.toml`.
@@ -167,7 +166,7 @@ pub const HOSTS: &[Host] = &[
         name: "GitHubCopilotCLI",
         template: "GitHubCopilotCLI/mcp-config.json",
         format: Format::Json,
-        wrapper: None,
+        wrapper: Some("mcpServers"),
         url_field: "url",
         headers_field: "headers",
         env_field: "env",
@@ -511,8 +510,8 @@ pub fn servers_from_value(root: &Value, host: &Host) -> Result<Servers> {
     let mut entries = Vec::with_capacity(map.len());
     for (name, raw) in map {
         // Not every key inside a wrapper is a server: opencode carries `$schema` and
-        // Gemini carries `_comment` at the top level, and Copilot has no wrapper at
-        // all, so its whole document is the server map.
+        // Gemini carries `_comment`. A host may also have no wrapper at all, in which
+        // case its whole document is the server map and the same filter applies.
         if name.starts_with('$') || name.starts_with('_') {
             continue;
         }

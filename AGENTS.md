@@ -109,6 +109,35 @@ Two edits, and the split matters:
 The manifest validates that both sides agree; a host in one and not the other is an
 error, not a silent omission.
 
+## When a host changes its schema
+
+Hosts revise their config format, and the failure is total rather than partial: the
+host rejects the whole file and starts with **no** servers. Copilot CLI 1.0.80 began
+requiring the `mcpServers` wrapper it had previously done without, and every server
+vanished behind one line — `Failed to read configuration ...: Error: mcpServers:
+Required`.
+
+Fixing the `HOSTS` row is only half of it. `render` updates the template, but the live
+config is still in the old shape, and `deploy` refuses it — ``no `mcpServers` block`` —
+because `splice` locates the block by the wrapper the dialect now declares. That is the
+right behavior: a wrapper migration restructures the whole file, and `deploy` is only
+ever allowed to replace the MCP block (invariant 4). So the live file takes a **one-time
+manual migration**, and it is not `deploy`'s job:
+
+```sh
+cp -p ~/.copilot/mcp-config.json ~/.copilot/mcp-config.json.bak   # 0600 must survive
+# wrap the existing root object in the new key, preserving the servers verbatim
+mcpctl deploy --host GitHubCopilotCLI --dry-run   # expect dirty:false — wrapper was all
+```
+
+Confirm with the host's own loader rather than by reading the JSON. Every host worth
+deploying to can list what it parsed, and that is the only check that proves the file
+is acceptable to it:
+
+```sh
+HOME=/tmp/homesim copilot mcp list   # names every server it actually loaded
+```
+
 ## Adding a server
 
 One edit for a server that needs no credential: a `[[servers]]` entry in `mcp.toml`. Its
